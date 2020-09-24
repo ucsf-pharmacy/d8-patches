@@ -1,7 +1,7 @@
-diff --git a/src/MediaLibraryEditorOpener.php b/src/MediaLibraryEditorOpener.php
+diff --git a/modules/media_library/src/MediaLibraryEditorOpener.php b/modules/media_library/src/MediaLibraryEditorOpener.php
 index 0c0af98..d0394d8 100644
---- a/src/MediaLibraryEditorOpener.php
-+++ b/src/MediaLibraryEditorOpener.php
+--- a/modules/media_library/src/MediaLibraryEditorOpener.php
++++ b/modules/media_library/src/MediaLibraryEditorOpener.php
 @@ -70,9 +70,11 @@ class MediaLibraryEditorOpener implements MediaLibraryOpenerInterface {
        'attributes' => [
          'data-entity-type' => 'media',
@@ -13,5 +13,5 @@ index 0c0af98..d0394d8 100644
 +      $values['attributes']['data-caption'] = $selected_media->field_caption->value;
 +    }
      $response->addCommand(new EditorDialogSave($values));
- 
+
      return $response;
