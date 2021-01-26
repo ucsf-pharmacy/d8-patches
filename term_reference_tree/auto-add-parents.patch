@@ -1,0 +1,16 @@
+diff --git a/src/Plugin/Field/FieldWidget/TermReferenceTree.php b/src/Plugin/Field/FieldWidget/TermReferenceTree.php
+index c89c115..b4ca056 100644
+--- a/src/Plugin/Field/FieldWidget/TermReferenceTree.php
++++ b/src/Plugin/Field/FieldWidget/TermReferenceTree.php
+@@ -177,9 +177,9 @@ class TermReferenceTree extends WidgetBase {
+     if ($element['#max_choices'] != 1) {
+       foreach ($items as $child) {
+         if (!empty($child['#value'])) {
+-          // If the element is leaves only and select parents is on,
++          // If select parents is on,
+           // then automatically add all the parents of each selected value.
+-          if (!empty($element['#select_parents']) && !empty($element['#leaves_only'])) {
++          if (!empty($element['#select_parents'])) {
+             foreach ($child['#parent_values'] as $parent_tid) {
+               if (!in_array([$element['#value_key'] => $parent_tid], $value)) {
+                 array_push($value, [$element['#value_key'] => $parent_tid]);
