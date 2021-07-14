@@ -1,0 +1,22 @@
+diff --git a/term_reference_tree.module b/term_reference_tree.module
+index 14e1456..b3a5603 100644
+--- a/term_reference_tree.module
++++ b/term_reference_tree.module
+@@ -348,6 +348,17 @@ function _term_reference_tree_build_item($element, $term, $form_state, $value, $
+     $term_name = $term->name;
+   }
+ 
++  // Perform view access check to respect Domain Access Entity module permissions
++  if (\Drupal::moduleHandler()->moduleExists('domain_entity') && !empty($term->tid)) {
++    $t = \Drupal::entityTypeManager()
++      ->getStorage('taxonomy_term')
++      ->load($term->tid);
++    $access = $t->access('view', \Drupal::currentUser());
++    if(!$access) {
++      return;
++    }
++  }
++
+   $container = [
+     '#type' => 'checkbox_tree_item',
+     '#max_choices' => $max_choices,
