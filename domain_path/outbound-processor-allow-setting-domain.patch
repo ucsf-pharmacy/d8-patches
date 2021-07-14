@@ -7,7 +7,7 @@ index 21f9696..baad7b2 100755
        $properties = [
          'source' => $unaliased_path,
 -        'domain_id' => $active_domain->id(),
-+        'domain_id' => (!empty($options['domain_id'])) ? $options['domain_id'] : $active_domain->id(), // @see PATCHES.txt #1
++        'domain_id' => (!empty($options['domain_id'])) ? $options['domain_id'] : $active_domain->id(), // allow outbound path processors to specify domain
          'language' => $language->getId(),
        ];
        $domain_paths = $this->entityTypeManager->getStorage('domain_path')->loadByProperties($properties);
