@@ -1,0 +1,138 @@
+diff --git a/entityconnect.module b/entityconnect.module
+index 9c3b58d..3fbf5dc 100644
+--- a/entityconnect.module
++++ b/entityconnect.module
+@@ -82,6 +82,15 @@ function entityconnect_form_alter(&$form, FormStateInterface $form_state, $form_
+   // Adds entity connect buttons to any ref fields in the form.
+   EntityconnectFormUtils::entityFormAlter($form, $form_state);
+ 
++  $entity = NULL;
++  if (method_exists($form_state->getFormObject(), 'getEntity')) {
++    /** @var \Drupal\Core\Entity\Entity $entity */
++    $entity = $form_state->getFormObject()->getEntity();
++  }
++
++  if ($entity instanceof \Drupal\Core\Entity\ContentEntityBase && \Drupal::moduleHandler()->moduleExists('paragraphs')) {
++    EntityconnectFormUtils::checkParagraphsInlineFields($entity, $form);
++  }
+ }
+ 
+ /**
+diff --git a/src/Element/EntityconnectSubmit.php b/src/Element/EntityconnectSubmit.php
+index 1feb8ea..9ac18a9 100644
+--- a/src/Element/EntityconnectSubmit.php
++++ b/src/Element/EntityconnectSubmit.php
+@@ -127,6 +127,24 @@ public static function addEditButtonSubmit(array $form, FormStateInterface $form
+     // This gets the target_id wherever button is nested via parents.
+     $fieldContainer = EntityconnectNestedArray::getValue($form_state->getUserInput(), $parents, $keyExists);
+ 
++    // Check if field info is wrong because field might be related to an embeded entity like paragraphs
++    foreach ($source_entity->getFieldDefinitions() as $definition ) {
++      $first_parent = reset($parents);
++
++      // Ensure we do not process if field is first level
++      if ($field == $first_parent) continue;
++
++      // Only process the definition matching parent
++      if ($definition->getName() != $first_parent) continue;
++
++      $settings = $definition->getFieldStorageDefinition()->getSettings();
++
++      // Get definition reference
++      if (!empty($settings['target_type'])) {
++        $fieldInfo = FieldStorageConfig::loadByName($settings['target_type'], $field);
++      }
++    }
++
+     // Initialize target_id.
+     $target_id = '';
+ 
+diff --git a/src/EntityconnectFormUtils.php b/src/EntityconnectFormUtils.php
+index bb5ee92..38ae1e5 100644
+--- a/src/EntityconnectFormUtils.php
++++ b/src/EntityconnectFormUtils.php
+@@ -77,6 +77,65 @@ public static function entityFormAlter(array &$form, FormStateInterface $form_st
+   }
+ 
+   /**
++   * Process paragraphs fields if available, (Integration with entityconnect)
++   *
++   * @param Entity $entity
++   *  The entity object
++   * @param [] $form
++   * The form array
++   */
++  public static function checkParagraphsInlineFields($entity, &$form) {
++    // Get field definitions
++    $definitions = $entity->getFieldDefinitions();
++
++    foreach ($definitions as $key => $definition) {
++      // if field its not a fieldconfig instance bailout
++      if (!($definition instanceof FieldConfig)) continue;
++
++      // if field does not exist in form bailout
++      if (empty($form[$key])) continue;
++
++      $settings = $definition->getFieldStorageDefinition()->getSettings();
++
++      // Only targeting paragraphs fields
++      if (!empty($settings['target_type']) && $settings['target_type'] == 'paragraph') {
++        $field_name = $definition->getName();
++        $field = &$form[$field_name];
++
++        $index = 0;
++        // Loops for every paragraphs instances
++        while (!empty($field['widget'][$index]['subform'])) {
++          $item = &$field['widget'][$index];
++          $subform = &$item['subform'];
++
++          // if paragraph type not defined bailout
++          if (empty($item['#paragraph_type'])) {
++            continue;
++          }
++
++          // Instantiate paragraph bundle for continuing diving recursively (nested paragraphs)
++          $paragraph = \Drupal\paragraphs\Entity\Paragraph::create(['type' => $item['#paragraph_type']]);
++
++          self::checkParagraphsInlineFields($paragraph, $subform);
++
++          $index++;
++        }
++      }
++      // if entity is of type paragraph and  field is entity reference integrate it with entity connect
++      elseif ($entity instanceof \Drupal\paragraphs\Entity\Paragraph && $definition->getType() == 'entity_reference') {
++        $form[$key]['#host_entity'] = [
++          'type' => $entity->getEntityTypeId(),
++          'bundle' => $entity->bundle()
++        ];
++        $form[$key]['#process'][] = [
++          '\Drupal\entityconnect\EntityconnectWidgetProcessor',
++          'process',
++        ];
++      }
++    }
++  }
++
++  /**
+    * Form API #validate callback for a form with entity_reference fields.
+    *
+    * Removes the entityconnect button values from form_state to prevent
+diff --git a/src/EntityconnectWidgetProcessor.php b/src/EntityconnectWidgetProcessor.php
+index 6725d8d..1b8af7d 100644
+--- a/src/EntityconnectWidgetProcessor.php
++++ b/src/EntityconnectWidgetProcessor.php
+@@ -93,6 +93,14 @@ public static function process(array $element, FormStateInterface $form_state, a
+     $entity = $form_state->getFormObject()->getEntity();
+     $fieldDefinition = $entity->getFieldDefinition($element['widget']['#field_name']);
+ 
++    // if host_entity is defined load field definition based on it
++    if (!empty($element['#host_entity'])) {
++      $storage = \Drupal::entityTypeManager()->getStorage($element['#host_entity']['type']);
++      $paragraph = $storage->create(['type' => $element['#host_entity']['bundle']]);
++
++      $fieldDefinition = $paragraph->getFieldDefinition($element['widget']['#field_name']);
++    }
++
+     // Instantiate this class so we don't have to pass variables around.
+     $widgetProcessor = new EntityconnectWidgetProcessor($fieldDefinition, $element['widget']);
+ 
