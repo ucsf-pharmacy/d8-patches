@@ -1,0 +1,16 @@
+diff --git a/trim.module b/trim.module
+index 5217063..9a1b52c 100644
+--- a/trim.module
++++ b/trim.module
+@@ -11,6 +11,11 @@ use Drupal\Core\Form\FormStateInterface;
+  * Implements hook_form_alter().
+  */
+ function trim_form_alter(&$form, FormStateInterface $form_state, $form_id) {
++  // Do trimming only for content entity types.
++  $entity_type = $form_state->getformObject()->getEntity()->getEntityType();
++  if (get_class($entity_type) != 'Drupal\Core\Entity\ContentEntityType') {
++    return;
++  }
+   // Ensure that there is an array here.
+   if (!isset($form['#validate'])) {
+     $form['#validate'] = [];
