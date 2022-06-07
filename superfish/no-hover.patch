@@ -1,0 +1,37 @@
+diff --git a/superfish.js b/superfish.js
+index de9ee45..f2fcf45 100644
+--- a/superfish.js
++++ b/superfish.js
+@@ -19,20 +19,20 @@
+       c = sf.c,
+       $arrow = $(['<span class="',c.arrowClass,'"> &#187;</span>'].join('')),
+       over = function(){
+-        var $$ = $(this), menu = getMenu($$);
+-        clearTimeout(menu.sfTimer);
+-        $$.showSuperfishUl().siblings().hideSuperfishUl();
++        // var $$ = $(this), menu = getMenu($$);
++        // clearTimeout(menu.sfTimer);
++        // $$.showSuperfishUl().siblings().hideSuperfishUl();
+       },
+       out = function(){
+-        var $$ = $(this), menu = getMenu($$), o = sf.op;
+-        clearTimeout(menu.sfTimer);
+-        menu.sfTimer=setTimeout(function(){
+-          if ($$.children('.sf-clicked').length == 0){
+-            o.retainPath=($.inArray($$[0],o.$path)>-1);
+-            $$.hideSuperfishUl();
+-            if (o.$path.length && $$.parents(['li.',o.hoverClass].join('')).length<1){over.call(o.$path);}
+-          }
+-        },o.delay);
++        // var $$ = $(this), menu = getMenu($$), o = sf.op;
++        // clearTimeout(menu.sfTimer);
++        // menu.sfTimer=setTimeout(function(){
++        //   if ($$.children('.sf-clicked').length == 0){
++        //     o.retainPath=($.inArray($$[0],o.$path)>-1);
++        //     $$.hideSuperfishUl();
++        //     if (o.$path.length && $$.parents(['li.',o.hoverClass].join('')).length<1){over.call(o.$path);}
++        //   }
++        // },o.delay);
+       },
+       getMenu = function($menu){
+         var menu = $menu.parents(['ul.',c.menuClass,':first'].join(''))[0];
