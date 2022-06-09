@@ -1,5 +1,5 @@
 diff --git a/sftouchscreen.js b/sftouchscreen.js
-index 8364cf4..18146e2 100644
+index 8364cf4..9af28cf 100644
 --- a/sftouchscreen.js
 +++ b/sftouchscreen.js
 @@ -20,6 +20,8 @@
@@ -11,11 +11,11 @@ index 8364cf4..18146e2 100644
        disableHover: false
      }, options);
  
-@@ -37,6 +39,7 @@
-             var
-             // Cloning the hyperlink of the parent menu item.
+@@ -39,6 +41,7 @@
              cloneLink = parent.children('a.menuparent,span.nolink.menuparent').clone(),
-+            cloneLink = cloneLink.text(options.clonePrefix + cloneLink.text() + options.cloneSuffix),
              // Wrapping the hyerplinks in <li>.
              cloneLink = $('<li class="sf-clone-parent" />').html(cloneLink);
++            cloneLink.find('a').prepend(options.clonePrefix).append(options.cloneSuffix);
              // Removing unnecessary stuff.
+             cloneLink.find('.sf-sub-indicator').remove(),
+             // Adding a helper class and attaching them to the sub-menus.
