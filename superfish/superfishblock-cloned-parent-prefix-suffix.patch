@@ -1,0 +1,56 @@
+diff --git a/src/Plugin/Block/SuperfishBlock.php b/src/Plugin/Block/SuperfishBlock.php
+index 3b740a1..6b91076 100644
+--- a/src/Plugin/Block/SuperfishBlock.php
++++ b/src/Plugin/Block/SuperfishBlock.php
+@@ -200,6 +200,16 @@ class SuperfishBlock extends SystemMenuBlock {
+         2 => $default,
+       ],
+     ];
++    $form['sf-plugins']['sf-touchscreen']['superfish_touch_cloneprefix'] = [
++      '#type' => 'textfield',
++      '#title' => 'Cloned parent link text prefix',
++      '#default_value' => $this->configuration['touch_cloneprefix'],
++    ];
++    $form['sf-plugins']['sf-touchscreen']['superfish_touch_clonesuffix'] = [
++      '#type' => 'textfield',
++      '#title' => 'Cloned parent link text suffix',
++      '#default_value' => $this->configuration['touch_clonesuffix'],
++    ];
+     $default = sprintf('%s <em>(%s)</em>',
+       $this->t('False'),
+       $this->t('Default')
+@@ -931,6 +941,16 @@ class SuperfishBlock extends SystemMenuBlock {
+       'sf-touchscreen',
+       'superfish_touchbh',
+     ]);
++    $this->configuration['touch_cloneprefix'] = $form_state->getValue([
++      'sf-plugins',
++      'sf-touchscreen',
++      'superfish_touch_cloneprefix',
++    ]);
++    $this->configuration['touch_clonesuffix'] = $form_state->getValue([
++      'sf-plugins',
++      'sf-touchscreen',
++      'superfish_touch_clonesuffix',
++    ]);
+     $this->configuration['touchdh'] = $form_state->getValue([
+       'sf-plugins',
+       'sf-touchscreen',
+@@ -1246,6 +1266,8 @@ class SuperfishBlock extends SystemMenuBlock {
+       $build['#attached']['library'][] = 'superfish/superfish_touchscreen';
+       $behaviour = $this->configuration['touchbh'];
+       $sfplugins['touchscreen']['behaviour'] = ($behaviour != 2) ? $behaviour : '';
++      $sfplugins['touchscreen']['clonePrefix'] = $this->configuration['touch_cloneprefix'];
++      $sfplugins['touchscreen']['cloneSuffix'] = $this->configuration['touch_clonesuffix'];
+       $sfplugins['touchscreen']['disableHover'] = $this->configuration['touchdh'];
+       switch ($touchscreen) {
+         case 1:
+@@ -1597,6 +1619,8 @@ class SuperfishBlock extends SystemMenuBlock {
+       'hoverintent' => 1,
+       'touch' => 0,
+       'touchbh' => 2,
++      'touch_cloneprefix' => '',
++      'touch_clonesuffix' => '',
+       'touchdh' => 0,
+       'touchbp' => 768,
+       'touchua' => 0,

@@ -1,0 +1,21 @@
+diff --git a/sftouchscreen.js b/sftouchscreen.js
+index 8364cf4..18146e2 100644
+--- a/sftouchscreen.js
++++ b/sftouchscreen.js
+@@ -20,6 +20,8 @@
+       breakpointUnit: 'px',
+       useragent: '',
+       behaviour: 2,
++      clonePrefix: '',
++      cloneSuffix: '',
+       disableHover: false
+     }, options);
+ 
+@@ -37,6 +39,7 @@
+             var
+             // Cloning the hyperlink of the parent menu item.
+             cloneLink = parent.children('a.menuparent,span.nolink.menuparent').clone(),
++            cloneLink = cloneLink.text(options.clonePrefix + cloneLink.text() + options.cloneSuffix),
+             // Wrapping the hyerplinks in <li>.
+             cloneLink = $('<li class="sf-clone-parent" />').html(cloneLink);
+             // Removing unnecessary stuff.
